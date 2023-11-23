@@ -1,0 +1,75 @@
+import random
+
+cartas = { 
+    chr(0x1f0a1): 11, 
+    chr(0x1f0a2): 2, 
+    chr(0x1f0a3): 3, 
+    chr(0x1f0a4): 4, 
+    chr(0x1f0a5): 5, 
+    chr(0x1f0a6): 6, 
+    chr(0x1f0a7): 7, 
+    chr(0x1f0a8): 8, 
+    chr(0x1f0a9): 9, 
+    chr(0x1f0aa): 10, 
+    chr(0x1f0ab): 10, 
+    chr(0x1f0ad): 10, 
+    chr(0x1f0ae): 10, 
+}
+
+def repartir_cartas():
+    """Repartir dos cartas para comenzar el juego."""
+    mano_jugador = [random.choice(list(cartas.keys())) for _ in range(2)]
+    mano_dealer = [random.choice(list(cartas.keys())) for _ in range(2)]
+    return mano_jugador, mano_dealer
+
+def calcular_puntuacion(mano):
+    """Calcular la puntuación de una mano."""
+    puntuacion = sum(cartas[carta] for carta in mano)
+    # Verificar ases y ajustar la puntuación si es necesario
+    for carta in mano:
+        if carta in cartas and cartas[carta] == 11 and puntuacion > 21:
+            puntuacion -= 10
+    return puntuacion
+
+def blackjack():
+    """Ejecutar el juego de Blackjack."""
+    mano_jugador, mano_dealer = repartir_cartas()
+
+    while True:
+        puntuacion_jugador = calcular_puntuacion(mano_jugador)
+        puntuacion_dealer = calcular_puntuacion(mano_dealer)
+
+        print(f"Tus cartas: {mano_jugador}, puntuación actual: {puntuacion_jugador}")
+        print(f"Primera carta del dealer: {mano_dealer[0]}")
+
+        # Verificar si hay Blackjack
+        if puntuacion_jugador == 21:
+            print("¡Blackjack! ¡Ganaste!")
+            break
+
+        # Preguntar al jugador si quiere tomar otra carta
+        tomar_carta = input("Escribe 's' para tomar otra carta, 'n' para pasar: ").lower()
+
+        if tomar_carta == 's':
+            mano_jugador.append(random.choice(list(cartas.keys())))
+        else:
+            # El jugador pasa, ahora es el turno del dealer
+            while puntuacion_dealer < 17:
+                mano_dealer.append(random.choice(list(cartas.keys())))
+                puntuacion_dealer = calcular_puntuacion(mano_dealer)
+
+            print(f"Tu mano final: {mano_jugador}, puntuación final: {puntuacion_jugador}")
+            print(f"Mano final del dealer: {mano_dealer}, puntuación final: {puntuacion_dealer}")
+
+            # Determinar al ganador
+            if puntuacion_dealer > 21 or (puntuacion_jugador <= 21 and puntuacion_jugador > puntuacion_dealer):
+                print("¡Ganaste!")
+            elif puntuacion_jugador == puntuacion_dealer:
+                print("¡Es un empate!")
+            else:
+                print("¡Perdiste!")
+
+            break
+
+if __name__ == "__main__":
+    blackjack()
